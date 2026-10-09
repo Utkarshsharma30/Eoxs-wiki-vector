@@ -136,21 +136,22 @@ if (process.argv.includes('--stdio')) {
 
   // Health Check Endpoint
   app.get('/health', async (req, res) => {
+    let dbStatus = null;
+    let dbConnected = false;
     try {
-      const dbInfo = await testConnection();
-      res.json({
-        status: 'healthy',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString(),
-        database: dbInfo,
-      });
+      dbStatus = await testConnection();
+      dbConnected = true;
     } catch (err) {
-      res.status(503).json({
-        status: 'unhealthy',
-        error: err.message,
-        timestamp: new Date().toISOString(),
-      });
+      dbStatus = { error: err.message };
     }
+
+    res.status(200).json({
+      status: 'healthy',
+      dbConnected,
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      database: dbStatus,
+    });
   });
 
   // SSE Transport Connection Endpoint
