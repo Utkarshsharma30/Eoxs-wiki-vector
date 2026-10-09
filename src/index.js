@@ -203,26 +203,91 @@ if (process.argv.includes('--stdio')) {
     });
   });
 
-  // Message Handler Endpoint for all post routes
+  // Universal Message Handler for both SSE session messages & direct HTTP JSON-RPC
   const handlePostMessage = async (req, res) => {
     const sessionId = req.query.sessionId;
-    console.log(`[Message] Received message for session: ${sessionId}`);
+    console.log(`[Message] Received POST on ${req.path}, sessionId: ${sessionId}, body method: ${req.body?.method}`);
     
-    if (!sessionId) {
-      return res.status(400).json({ error: 'Missing required query parameter: sessionId' });
+    // 1. If sessionId exists and matches active transport, delegate to SSE transport handler
+    if (sessionId && transports.has(sessionId)) {
+      const transport = transports.get(sessionId);
+      return await transport.handlePostMessage(req, res);
     }
 
-    const transport = transports.get(sessionId);
-    if (!transport) {
-      return res.status(404).json({ error: `No active SSE transport found for session ID: ${sessionId}` });
+    // 2. Direct HTTP JSON-RPC fallback handler (for HTTP connectors & initial validation probes)
+    const { jsonrpc, id, method, params } = req.body || {};
+
+    if (method === 'initialize') {
+      return res.json({
+        jsonrpc: jsonrpc || '2.0',
+        id: id ?? 1,
+        result: {
+          protocolVersion: '2024-11-05',
+          capabilities: {
+            tools: {},
+          },
+          serverInfo: {
+            name: 'eoxs-wiki-vector-mcp',
+            version: '1.0.0',
+          },
+        },
+      });
     }
 
-    await transport.handlePostMessage(req, res);
+    if (method === 'tools/list') {
+      return res.json({
+        jsonrpc: jsonrpc || '2.0',
+        id: id ?? 1,
+        result: {
+          tools: TOOL_DEFINITIONS,
+        },
+      });
+    }
+
+    if (method === 'tools/call' && params) {
+      try {
+        const result = await handleToolCall(params.name, params.arguments || {});
+        return res.json({
+          jsonrpc: jsonrpc || '2.0',
+          id: id ?? 1,
+          result,
+        });
+      } catch (err) {
+        return res.json({
+          jsonrpc: jsonrpc || '2.0',
+          id: id ?? 1,
+          error: {
+            code: -32603,
+            message: err.message,
+          },
+        });
+      }
+    }
+
+    if (method === 'ping') {
+      return res.json({
+        jsonrpc: jsonrpc || '2.0',
+        id: id ?? 1,
+        result: {},
+      });
+    }
+
+    if (method === 'notifications/initialized') {
+      return res.status(200).send();
+    }
+
+    // Default HTTP 200 OK for platform validation probes
+    return res.status(200).json({
+      status: 'ok',
+      server: 'eoxs-wiki-vector-mcp',
+      message: 'MCP POST endpoint ready',
+    });
   };
 
   app.post('/messages', authMiddleware, handlePostMessage);
   app.post('/sse', authMiddleware, handlePostMessage);
   app.post('/mcp', authMiddleware, handlePostMessage);
+  app.post('/', authMiddleware, handlePostMessage);
 
   const serverInstance = app.listen(PORT, '0.0.0.0', () => {
     console.log(`=================================================`);
