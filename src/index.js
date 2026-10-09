@@ -23,7 +23,7 @@ const API_KEY = process.env.API_KEY;
 function createMcpServer() {
   const server = new Server(
     {
-      name: 'eoxs-wiki-db-mcp',
+      name: 'eoxs-wiki-vector-mcp',
       version: '1.0.0',
     },
     {
@@ -72,7 +72,14 @@ if (process.argv.includes('--stdio')) {
 } else {
   // HTTP / SSE Server for Render Deployment
   const app = express();
-  app.use(cors());
+
+  // Allow all CORS origins and preflight requests
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Accept'],
+  }));
+  
   app.use(express.json());
 
   // Optional API Key Middleware
@@ -90,13 +97,55 @@ if (process.argv.includes('--stdio')) {
   // Active SSE transports mapped by session ID
   const transports = new Map();
 
-  // Root Landing Endpoint
-  app.get('/', (req, res) => {
+  // SSE Transport Connection Handler
+  const handleSseConnection = async (req, res) => {
+    console.log(`[SSE] New client connection request on ${req.path}`);
+    const server = createMcpServer();
+    const transport = new SSEServerTransport('/messages', res);
+    
+    const sessionId = transport.sessionId;
+    transports.set(sessionId, transport);
+    
+    console.log(`[SSE] Created session: ${sessionId}`);
+
+    transport.onclose = () => {
+      console.log(`[SSE] Session closed: ${sessionId}`);
+      transports.delete(sessionId);
+    };
+
+    await server.connect(transport);
+  };
+
+  // Support /sse and /mcp endpoints for SSE connection
+  app.get('/sse', authMiddleware, handleSseConnection);
+  app.get('/mcp', authMiddleware, handleSseConnection);
+
+  // Discovery Endpoints for MCP Connectors
+  app.get('/.well-known/mcp', (req, res) => {
+    res.json({
+      name: 'eoxs-wiki-vector',
+      description: 'EOXS & Travel Wiki Database MCP Server',
+      version: '1.0.0',
+      transports: {
+        sse: {
+          url: '/sse',
+          messageUrl: '/messages',
+        },
+      },
+    });
+  });
+
+  // Root Landing Endpoint (handles SSE if requested, otherwise returns HTML status)
+  app.get('/', authMiddleware, (req, res) => {
+    if (req.headers.accept && req.headers.accept.includes('text/event-stream')) {
+      return handleSseConnection(req, res);
+    }
+
     res.type('html').send(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>EOXS Wiki Database MCP Server</title>
+          <title>EOXS & Travel Wiki DB MCP Server</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 750px; margin: 40px auto; padding: 0 20px; line-height: 1.6; background: #0f172a; color: #f8fafc; }
             h1 { color: #38bdf8; }
@@ -107,14 +156,14 @@ if (process.argv.includes('--stdio')) {
           </style>
         </head>
         <body>
-          <h1>EOXS Wiki DB MCP Server</h1>
+          <h1>EOXS & Travel Wiki DB MCP Server</h1>
           <p><span class="status">● Running</span> Server is live and ready for MCP client connections.</p>
           
           <div class="card">
             <h3>Endpoints</h3>
             <ul>
-              <li><code>GET /health</code> - Server and Database health check</li>
-              <li><code>GET /sse</code> - Server-Sent Events MCP connection endpoint</li>
+              <li><code>GET /health</code> - Health check</li>
+              <li><code>GET /sse</code> or <code>GET /mcp</code> - Server-Sent Events MCP connection endpoint</li>
               <li><code>POST /messages</code> - MCP JSON-RPC message endpoint</li>
             </ul>
           </div>
@@ -123,7 +172,7 @@ if (process.argv.includes('--stdio')) {
             <h3>MCP Client Configuration (SSE)</h3>
             <pre>{
   "mcpServers": {
-    "eoxs-wiki-db": {
+    "travel-wiki-db": {
       "url": "https://${req.headers.host}/sse"
     }
   }
@@ -154,41 +203,30 @@ if (process.argv.includes('--stdio')) {
     });
   });
 
-  // SSE Transport Connection Endpoint
-  app.get('/sse', authMiddleware, async (req, res) => {
-    console.log('[SSE] New client connection request');
-    const server = createMcpServer();
-    const transport = new SSEServerTransport('/messages', res);
-    
-    const sessionId = transport.sessionId;
-    transports.set(sessionId, transport);
-    
-    console.log(`[SSE] Created session: ${sessionId}`);
-
-    transport.onclose = () => {
-      console.log(`[SSE] Session closed: ${sessionId}`);
-      transports.delete(sessionId);
-    };
-
-    await server.connect(transport);
-  });
-
-  // Message Handler Endpoint
-  app.post('/messages', authMiddleware, async (req, res) => {
+  // Message Handler Endpoint for all post routes
+  const handlePostMessage = async (req, res) => {
     const sessionId = req.query.sessionId;
     console.log(`[Message] Received message for session: ${sessionId}`);
     
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Missing required query parameter: sessionId' });
+    }
+
     const transport = transports.get(sessionId);
     if (!transport) {
-      return res.status(400).json({ error: `No active SSE transport found for session ID: ${sessionId}` });
+      return res.status(404).json({ error: `No active SSE transport found for session ID: ${sessionId}` });
     }
 
     await transport.handlePostMessage(req, res);
-  });
+  };
+
+  app.post('/messages', authMiddleware, handlePostMessage);
+  app.post('/sse', authMiddleware, handlePostMessage);
+  app.post('/mcp', authMiddleware, handlePostMessage);
 
   const serverInstance = app.listen(PORT, '0.0.0.0', () => {
     console.log(`=================================================`);
-    console.log(`🚀 EOXS Wiki DB MCP Server running on port ${PORT}`);
+    console.log(`🚀 EOXS & Travel Wiki DB MCP Server running on port ${PORT}`);
     console.log(`👉 SSE URL: http://localhost:${PORT}/sse`);
     console.log(`👉 Health Check: http://localhost:${PORT}/health`);
     console.log(`=================================================`);
