@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: eoxs-wiki-db-mcp
+    env: node
+    region: oregon # or frankfurt, singapore, etc.
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DB_HOST
+        value: eoxs-db-live-cluster-do-user-42137371-0.d.db.ondigitalocean.com
+      - key: DB_PORT
+        value: "25060"
+      - key: DB_NAME
+        value: eoxs_wiki
+      - key: DB_USER
+        value: eoxs_app
+      - key: DB_PASSWORD
+        value: Eoxs6333_kronox_db
+      - key: DB_SSL
+        value: "true"
+      - key: API_KEY
+        sync: false # Set optional secret API key in Render dashboard

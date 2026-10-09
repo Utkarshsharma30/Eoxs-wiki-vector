@@ -1,0 +1,27 @@
+{
+  "name": "eoxs-wiki-db-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server for eoxs_wiki PostgreSQL database deployed on Render",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test-db": "node src/test-connection.js"
+  },
+  "keywords": [
+    "mcp",
+    "postgresql",
+    "render",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.3"
+  }
+}
