@@ -7,11 +7,11 @@ const { Pool } = pg;
 
 // Read configuration from environment variables or defaults
 const config = {
-  host: process.env.DB_HOST || 'eoxs-db-live-cluster-do-user-42137371-0.d.db.ondigitalocean.com',
-  port: parseInt(process.env.DB_PORT || '25060', 10),
-  database: process.env.DB_NAME || 'eoxs_wiki',
-  user: process.env.DB_USER || 'eoxs_app',
-  password: process.env.DB_PASSWORD || 'Eoxs6333_kronox_db',
+  host: process.env.DB_HOST || 'dpg-db4i892d0e5s73cep390-a.oregon-postgres.render.com',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  database: process.env.DB_NAME || 'travel_wiki_db_vector',
+  user: process.env.DB_USER || 'travel_wiki_db_vector_user',
+  password: process.env.DB_PASSWORD || '8Xp7Mg4DXZqTZFy0W5WOadlvDgHJdWS9',
   max: 10, // maximum pool connections
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,

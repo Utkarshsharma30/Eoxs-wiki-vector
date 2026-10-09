@@ -9,14 +9,14 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DB_HOST
-        value: eoxs-db-live-cluster-do-user-42137371-0.d.db.ondigitalocean.com
+        value: dpg-db4i892d0e5s73cep390-a # Internal hostname on Render
       - key: DB_PORT
-        value: "25060"
+        value: "5432"
       - key: DB_NAME
-        value: eoxs_wiki
+        value: travel_wiki_db_vector
       - key: DB_USER
-        value: eoxs_app
+        value: travel_wiki_db_vector_user
       - key: DB_PASSWORD
-        value: Eoxs6333_kronox_db
+        value: 8Xp7Mg4DXZqTZFy0W5WOadlvDgHJdWS9
       - key: DB_SSL
         value: "true"
