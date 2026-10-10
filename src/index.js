@@ -160,9 +160,20 @@ if (process.argv.includes('--stdio')) {
           <p><span class="status">● Running</span> Server is live and ready for MCP client connections.</p>
           
           <div class="card">
+            <h3>Features & Tools</h3>
+            <ul>
+              <li><code>search_hybrid</code> - Parallel hybrid search combining keyword (tsvector) and semantic search (pgvector)</li>
+              <li><code>search_vector</code> - Semantic vector similarity search via PostgreSQL pgvector</li>
+              <li><code>search_text</code> - Keyword full-text search via PostgreSQL tsvector</li>
+              <li><code>get_document</code> - Retrieve full wiki documents by title or path</li>
+              <li><code>execute_read_query</code> / <code>execute_write_query</code> - Execute database SQL queries</li>
+            </ul>
+          </div>
+
+          <div class="card">
             <h3>Endpoints</h3>
             <ul>
-              <li><code>GET /health</code> - Health check</li>
+              <li><code>GET /health</code> - Health check & DB connection status</li>
               <li><code>GET /sse</code> or <code>GET /mcp</code> - Server-Sent Events MCP connection endpoint</li>
               <li><code>POST /messages</code> - MCP JSON-RPC message endpoint</li>
             </ul>
