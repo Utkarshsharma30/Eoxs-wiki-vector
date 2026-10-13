@@ -39,11 +39,12 @@ export async function runVectorSearch(queryPrompt, { limit = 5, category = null 
       (1 - (c.embedding <=> $1::vector)) AS semantic_score
     FROM wiki_chunks c
     JOIN wiki_documents d ON d.id = c.document_id
+    WHERE c.embedding IS NOT NULL
   `;
   const params = [vectorStr];
 
   if (category) {
-    sql += ` WHERE d.category = $2 `;
+    sql += ` AND d.category = $2 `;
     params.push(category);
     sql += ` ORDER BY c.embedding <=> $1::vector LIMIT $3;`;
     params.push(limit);
