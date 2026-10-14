@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: eoxs-wiki-db-mcp
+    name: eoxs-wiki-vector
     runtime: node
     region: oregon
     plan: free

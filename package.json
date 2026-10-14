@@ -1,5 +1,5 @@
 {
-  "name": "eoxs-wiki-db-mcp",
+  "name": "eoxs-wiki-vector",
   "version": "1.0.0",
   "description": "MCP Server for eoxs_wiki PostgreSQL database deployed on Render",
   "main": "src/index.js",

@@ -78,7 +78,7 @@ To allow Render services to connect to your DigitalOcean Managed PostgreSQL Data
 ## 🔌 Connecting MCP Clients
 
 Once deployed on Render, your web service URL will be something like:  
-`https://eoxs-wiki-db-mcp.onrender.com`
+`https://eoxs-wiki-vector.onrender.com`
 
 ### Claude Desktop / Cursor / Antigravity SSE Configuration
 
@@ -88,7 +88,7 @@ Add this entry to your client's MCP configuration (`mcpServers` section):
 {
   "mcpServers": {
     "eoxs-wiki-db": {
-      "url": "https://eoxs-wiki-db-mcp.onrender.com/sse"
+      "url": "https://eoxs-wiki-vector.onrender.com/sse"
     }
   }
 }
@@ -100,7 +100,7 @@ Add this entry to your client's MCP configuration (`mcpServers` section):
 {
   "mcpServers": {
     "eoxs-wiki-db": {
-      "url": "https://eoxs-wiki-db-mcp.onrender.com/sse",
+      "url": "https://eoxs-wiki-vector.onrender.com/sse",
       "headers": {
         "x-api-key": "YOUR_SECRET_API_KEY"
       }
