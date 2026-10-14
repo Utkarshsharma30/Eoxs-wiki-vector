@@ -12,6 +12,10 @@ This MCP server communicates over **SSE (Server-Sent Events)** for cloud hosting
 
 | Tool Name | Type | Description |
 | :--- | :--- | :--- |
+| `search_hybrid` | Hybrid Search | **Recommended**. Parallel keyword (tsvector) + semantic vector search (pgvector) with server-side embeddings. |
+| `search_vector` | Semantic Search | Fast semantic vector search using pgvector cosine similarity. |
+| `search_text` | Keyword Search | Full-text search across documents using PostgreSQL tsvector and ts_rank. |
+| `get_document` | Retrieval | Retrieve full document content and metadata by ID, title, or file path. |
 | `execute_read_query` | Read | Execute `SELECT`, `EXPLAIN`, or `WITH` queries with positional parameters (`$1`, `$2`). |
 | `execute_write_query` | Write | Execute `INSERT`, `UPDATE`, `DELETE`, `CREATE TABLE` queries safely. |
 | `list_tables` | Metadata | List all tables/views in schema with estimated row counts. |

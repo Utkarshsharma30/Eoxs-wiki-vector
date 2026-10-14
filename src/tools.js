@@ -215,13 +215,13 @@ export async function runHybridSearch(queryPrompt, { limit = 5, category = null,
 export const TOOL_DEFINITIONS = [
   {
     name: 'search_hybrid',
-    description: 'PRIMARY & RECOMMENDED SEARCH TOOL. Performs parallel hybrid search (combining keyword text search and pgvector semantic vector search). The MCP server automatically generates vector embeddings on the server using @xenova/transformers (all-MiniLM-L6-v2) for your query text, so you do NOT need to write SQL or compute embeddings yourself. Returns top results ranked by merged hybrid score.',
+    description: 'PRIMARY & RECOMMENDED SEARCH TOOL. Performs parallel hybrid search (combining keyword text search and pgvector semantic vector search) across EOXS wiki documents and chunks. The MCP server automatically generates vector embeddings on the server using @xenova/transformers (all-MiniLM-L6-v2) for your query text, so you do NOT need to write SQL or compute embeddings yourself. Returns top results ranked by merged hybrid score.',
     inputSchema: {
       type: 'object',
       properties: {
         queryPrompt: {
           type: 'string',
-          description: 'Natural language search prompt or query (e.g. "best places to visit in Delhi" or "What are top attractions in Japan?")',
+          description: 'Natural language search prompt or query (e.g. "SmartQuote AI features and roadmap" or "Eastern States Steel operations and contacts")',
         },
         limit: {
           type: 'number',
@@ -230,7 +230,7 @@ export const TOOL_DEFINITIONS = [
         },
         category: {
           type: 'string',
-          description: 'Optional filter by category ("wiki", "raw", or "root")',
+          description: 'Optional filter by category ("entity", "concept", "source", "analysis", "overview", or "prospect")',
         },
         alpha: {
           type: 'number',
@@ -243,13 +243,13 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'search_vector',
-    description: 'Performs semantic vector similarity search using PostgreSQL pgvector extension. The MCP server automatically converts your natural language query into a 384-dimensional vector embedding on the server using @xenova/transformers, executing cosine similarity search without requiring manual SQL.',
+    description: 'Performs semantic vector similarity search using PostgreSQL pgvector extension on EOXS wiki embeddings. The MCP server automatically converts your natural language query into a 384-dimensional vector embedding on the server using @xenova/transformers, executing cosine similarity search without requiring manual SQL.',
     inputSchema: {
       type: 'object',
       properties: {
         queryPrompt: {
           type: 'string',
-          description: 'Natural language search prompt or question (e.g. "What are the best places to visit in Japan?")',
+          description: 'Natural language search prompt or question (e.g. "What is Steel Brain AI?" or "ERP client integrations and workflows")',
         },
         limit: {
           type: 'number',
@@ -258,7 +258,7 @@ export const TOOL_DEFINITIONS = [
         },
         category: {
           type: 'string',
-          description: 'Optional filter by category ("wiki", "raw", or "root")',
+          description: 'Optional filter by category ("entity", "concept", "source", "analysis", "overview", or "prospect")',
         },
       },
       required: ['queryPrompt'],
@@ -266,13 +266,13 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'search_text',
-    description: 'Performs full-text keyword search across wiki documents using PostgreSQL tsvector and ts_rank.',
+    description: 'Performs full-text keyword search across EOXS wiki documents using PostgreSQL tsvector and ts_rank.',
     inputSchema: {
       type: 'object',
       properties: {
         searchTerm: {
           type: 'string',
-          description: 'Keywords or search terms (e.g. "Delhi monuments")',
+          description: 'Keywords or search terms (e.g. "Gerdau", "SmartQuote", "PPC Metals")',
         },
         limit: {
           type: 'number',
@@ -281,7 +281,7 @@ export const TOOL_DEFINITIONS = [
         },
         category: {
           type: 'string',
-          description: 'Optional filter by category ("wiki", "raw", or "root")',
+          description: 'Optional filter by category ("entity", "concept", "source", "analysis", "overview", or "prospect")',
         },
       },
       required: ['searchTerm'],
@@ -289,13 +289,13 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'get_document',
-    description: 'Retrieve full document content and metadata by ID, title, or file path.',
+    description: 'Retrieve full document content and metadata by ID, title, or file path from the EOXS wiki database.',
     inputSchema: {
       type: 'object',
       properties: {
         identifier: {
           type: 'string',
-          description: 'Document ID (number), title, or file path (e.g. "wiki/Delhi.md" or "Delhi")',
+          description: 'Document ID (number), title, or file path (e.g. "SmartQuote AI" or "Chip Capinski")',
         },
       },
       required: ['identifier'],

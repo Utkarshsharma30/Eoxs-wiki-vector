@@ -5,13 +5,19 @@ dotenv.config();
 
 const { Pool } = pg;
 
-// Read configuration from environment variables or defaults
+// Filter out any legacy travel wiki database configurations from older deployments
+const isLegacyTravelDb = 
+  (process.env.DB_NAME && process.env.DB_NAME.includes('travel')) ||
+  (process.env.DB_USER && process.env.DB_USER.includes('travel')) ||
+  (process.env.DB_HOST && (process.env.DB_HOST.includes('dpg-') || process.env.DB_HOST.includes('render')));
+
+// Read configuration from environment variables or defaults (strictly pointing to eoxs_wiki)
 const config = {
-  host: process.env.DB_HOST || 'eoxs-db-live-cluster-do-user-42137371-0.d.db.ondigitalocean.com',
-  port: parseInt(process.env.DB_PORT || '25060', 10),
-  database: process.env.DB_NAME || 'eoxs_wiki',
-  user: process.env.DB_USER || 'eoxs_app',
-  password: process.env.DB_PASSWORD || 'Eoxs6333_kronox_db',
+  host: (!isLegacyTravelDb && process.env.DB_HOST) ? process.env.DB_HOST : 'eoxs-db-live-cluster-do-user-42137371-0.d.db.ondigitalocean.com',
+  port: parseInt((!isLegacyTravelDb && process.env.DB_PORT) ? process.env.DB_PORT : '25060', 10),
+  database: (!isLegacyTravelDb && process.env.DB_NAME) ? process.env.DB_NAME : 'eoxs_wiki',
+  user: (!isLegacyTravelDb && process.env.DB_USER) ? process.env.DB_USER : 'eoxs_app',
+  password: (!isLegacyTravelDb && process.env.DB_PASSWORD) ? process.env.DB_PASSWORD : 'Eoxs6333_kronox_db',
   max: 10, // maximum pool connections
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,

@@ -124,7 +124,7 @@ if (process.argv.includes('--stdio')) {
   app.get('/.well-known/mcp', (req, res) => {
     res.json({
       name: 'eoxs-wiki-vector',
-      description: 'EOXS & Travel Wiki Database MCP Server',
+      description: 'EOXS Wiki Vector Database MCP Server',
       version: '1.0.0',
       transports: {
         sse: {
@@ -145,7 +145,7 @@ if (process.argv.includes('--stdio')) {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>EOXS & Travel Wiki DB MCP Server</title>
+          <title>EOXS Wiki DB MCP Server</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 750px; margin: 40px auto; padding: 0 20px; line-height: 1.6; background: #0f172a; color: #f8fafc; }
             h1 { color: #38bdf8; }
@@ -156,7 +156,7 @@ if (process.argv.includes('--stdio')) {
           </style>
         </head>
         <body>
-          <h1>EOXS & Travel Wiki DB MCP Server</h1>
+          <h1>EOXS Wiki DB MCP Server</h1>
           <p><span class="status">● Running</span> Server is live and ready for MCP client connections.</p>
           
           <div class="card">
@@ -183,7 +183,7 @@ if (process.argv.includes('--stdio')) {
             <h3>MCP Client Configuration (SSE)</h3>
             <pre>{
   "mcpServers": {
-    "travel-wiki-db": {
+    "eoxs-wiki-db": {
       "url": "https://${req.headers.host}/sse"
     }
   }
@@ -302,7 +302,7 @@ if (process.argv.includes('--stdio')) {
 
   const serverInstance = app.listen(PORT, '0.0.0.0', () => {
     console.log(`=================================================`);
-    console.log(`🚀 EOXS & Travel Wiki DB MCP Server running on port ${PORT}`);
+    console.log(`🚀 EOXS Wiki DB MCP Server running on port ${PORT}`);
     console.log(`👉 SSE URL: http://localhost:${PORT}/sse`);
     console.log(`👉 Health Check: http://localhost:${PORT}/health`);
     console.log(`=================================================`);
